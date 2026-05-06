@@ -165,7 +165,13 @@ export default function Orders() {
 
   const completedCols = [
     { key: 'orderId', label: 'Order ID', render: v => <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 13 }}>{v}</span> },
-    { key: 'customer', label: 'Customer', render: (v, row) => <div><p style={{ fontWeight: 500 }}>{v}</p>{row.teamName && row.teamName !== v && <p style={{ fontSize: 12, color: 'var(--gray-dark)', fontWeight: 600 }}>{row.teamName}</p>}{row.productType ? <p style={{ fontSize: 11, color: 'var(--gray-mid)' }}>{row.productType}</p> : <p style={{ fontSize: 11, color: 'var(--gray-mid)' }}>{row.design}</p>}</div> },
+    { key: 'customer', label: 'Customer', render: (v, row) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <p style={{ fontWeight: 700, color: 'var(--black)', fontSize: 13, lineHeight: 1.2 }}>{v}</p>
+        <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || '—'}</p>
+        <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || row.design || '—'}</p>
+      </div>
+    )},
     { key: 'completedAt', label: 'Completed', render: v => formatDate(v) },
     { key: 'payment', label: 'Payment', render: (v, row) => <Badge status="status-green">Paid</Badge> },
     { key: 'totalAmount', label: 'Amount', render: (v, row) => <div><p>{formatCurrency(v)}</p><p style={{ fontSize: 12, color: '#2e7d32' }}>{formatCurrency(v)} received</p></div> },
@@ -242,7 +248,7 @@ export default function Orders() {
             </div>
           )}
 
-          {/* Customer + Contact — Admin only */}
+          {/* Customer + Team */}
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Customer Name {!isAdmin && <span style={{ fontSize: 10, background: '#fdecea', color: '#c62828', borderRadius: 4, padding: '1px 6px', marginLeft: 6, fontWeight: 600 }}>Admin Only</span>}</label>
@@ -256,6 +262,20 @@ export default function Orders() {
               {errors.customer && <p className="field-error">{errors.customer}</p>}
             </div>
             <div className="form-group">
+              <label className="form-label">Team Name {!isAdmin && <span style={{ fontSize: 10, background: '#fdecea', color: '#c62828', borderRadius: 4, padding: '1px 6px', marginLeft: 6, fontWeight: 600 }}>Admin Only</span>}</label>
+              <input
+                className="form-input"
+                value={editForm.teamName || ''}
+                onChange={e => ef('teamName', e.target.value)}
+                disabled={!isAdmin}
+                style={!isAdmin ? { background: 'var(--gray-surface)', color: 'var(--gray-mid)', cursor: 'not-allowed' } : {}}
+              />
+            </div>
+          </div>
+
+          {/* Contact + Deadline */}
+          <div className="form-row">
+            <div className="form-group">
               <label className="form-label">Contact {!isAdmin && <span style={{ fontSize: 10, background: '#fdecea', color: '#c62828', borderRadius: 4, padding: '1px 6px', marginLeft: 6, fontWeight: 600 }}>Admin Only</span>}</label>
               <input
                 className="form-input"
@@ -265,10 +285,6 @@ export default function Orders() {
                 style={!isAdmin ? { background: 'var(--gray-surface)', color: 'var(--gray-mid)', cursor: 'not-allowed' } : {}}
               />
             </div>
-          </div>
-
-          {/* Deadline + Status — Admin only for deadline/status; Status includes Complete option for Admin */}
-          <div className="form-row">
             <div className="form-group">
               <label className="form-label">Deadline {!isAdmin && <span style={{ fontSize: 10, background: '#fdecea', color: '#c62828', borderRadius: 4, padding: '1px 6px', marginLeft: 6, fontWeight: 600 }}>Admin Only</span>}</label>
               <input
@@ -281,6 +297,7 @@ export default function Orders() {
               />
               {errors.deadline && <p className="field-error">{errors.deadline}</p>}
             </div>
+          </div>
             <div className="form-group">
               <label className="form-label">Status {!isAdmin && <span style={{ fontSize: 10, background: '#fdecea', color: '#c62828', borderRadius: 4, padding: '1px 6px', marginLeft: 6, fontWeight: 600 }}>Admin Only</span>}</label>
               {isAdmin ? (
@@ -356,6 +373,10 @@ export default function Orders() {
             <div className="form-group">
               <label className="form-label">Customer *</label>
               <input className="form-input" value={editForm.customer} onChange={e => ef('customer', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Team Name</label>
+              <input className="form-input" value={editForm.teamName || ''} onChange={e => ef('teamName', e.target.value)} />
             </div>
             <div className="form-group">
               <label className="form-label">Deadline *</label>
