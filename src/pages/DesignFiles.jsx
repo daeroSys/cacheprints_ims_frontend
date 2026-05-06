@@ -49,8 +49,8 @@ export default function DesignFiles() {
     [orders]
   )
 
-  const ongoingOrders = allOrders.filter(o => !o.isCompleted)
-  const completedOrders = allOrders.filter(o => o.isCompleted)
+  const ongoingOrders = allOrders.filter(o => o.status !== 'completed' && !o.isCompleted)
+  const completedOrders = allOrders.filter(o => o.status === 'completed' || o.isCompleted)
 
   const applyFilters = (list, isCompletedTab = false) => {
     return list.filter(o => {
@@ -74,7 +74,7 @@ export default function DesignFiles() {
   const pgOngoing = usePagination(filteredOngoing, 10)
   const pgCompleted = usePagination(filteredCompleted, 10)
 
-  const displayStatus = (order) => order.isCompleted ? 'Completed' : order.status
+  const displayStatus = (order) => (order.status === 'completed' || order.isCompleted) ? 'Completed' : order.status
 
   const statusForBadge = (status) => {
     if (status === 'Completed') return 'status-green'
@@ -122,13 +122,44 @@ export default function DesignFiles() {
   };
 
   const renderOrderCard = (order, i) => {
+    const virtualFiles = []
+    if (order.paymentReceipt) {
+      virtualFiles.push({ 
+        id: 'dp-receipt', 
+        name: 'Downpayment Proof', 
+        url: order.paymentReceipt, 
+        notes: 'Initial Receipt', 
+        uploadedAt: order.paymentReceiptDate || order.createdAt,
+        isJOS: true 
+      })
+    }
+    if (order.finalDesignUrl) {
+      virtualFiles.push({ 
+        id: 'final-design', 
+        name: 'Final Approved Design', 
+        url: order.finalDesignUrl, 
+        notes: 'Printing File', 
+        uploadedAt: order.updatedAt,
+        isJOS: true 
+      })
+    }
+    if (order.finalPaymentReceipt) {
+      virtualFiles.push({ 
+        id: 'fp-receipt', 
+        name: 'Remaining Balance Proof', 
+        url: order.finalPaymentReceipt, 
+        notes: 'Final Payment', 
+        uploadedAt: order.finalPaymentReceiptDate || order.updatedAt,
+        isJOS: true 
+      })
+    }
+
     const synthesizedFiles = [
       ...(order.designFiles || []),
-      ...(order.paymentReceipt ? [{ id: 'dp-receipt', name: 'Downpayment Proof of Payment', url: order.paymentReceipt, notes: 'Initial 20% Deposit Receipt', uploadedAt: order.paymentReceiptDate || order.createdAt }] : []),
-      ...(order.finalDesignUrl ? [{ id: 'final-design', name: 'Final Approved Design', url: order.finalDesignUrl, notes: 'Design for Printing', uploadedAt: order.updatedAt }] : []),
-      ...(order.finalPaymentReceipt ? [{ id: 'fp-receipt', name: 'Remaining Balance Proof of Payment', url: order.finalPaymentReceipt, notes: 'Final 80% Payment Receipt', uploadedAt: order.finalPaymentReceiptDate || order.updatedAt }] : []),
-      { id: 'jo-sheet', name: 'Job Order Sheet (System Generated)', url: null, type: 'sheet', notes: 'Digital Production Sheet', uploadedAt: order.updatedAt }
+      ...virtualFiles,
+      { id: 'jo-sheet', name: 'Job Order Sheet', url: null, type: 'sheet', notes: 'System Generated', uploadedAt: order.updatedAt, isJOS: true }
     ]
+
     const files = synthesizedFiles
     const status = displayStatus(order)
     return (
@@ -136,7 +167,7 @@ export default function DesignFiles() {
         <div className="df-card__head">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <p className="df-card__id">{order.orderId}</p>
-            <span style={{ fontWeight: 700, color: 'var(--gray-dark)', fontSize: 13 }}>{order.customer}</span>
+            <span style={{ fontWeight: 700, color: 'var(--gray-dark)', fontSize: 13 }}>{order.customerName || order.customer}</span>
             {order.teamName && <span style={{ fontSize: 11, color: 'var(--gray-mid)' }}>Team: {order.teamName}</span>}
             {order.productType && <span style={{ fontSize: 10, color: 'var(--primary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{order.productType}</span>}
           </div>
