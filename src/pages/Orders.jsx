@@ -389,7 +389,7 @@ export default function Orders() {
               <div>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Job Order</p>
                 <p style={{ fontSize: 22, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', marginBottom: 2 }}>{viewModal.orderId}</p>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>{viewModal.customer}</p>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>{typeof viewModal.customer === 'object' ? '—' : viewModal.customer}</p>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Total Amount</p>
@@ -420,7 +420,9 @@ export default function Orders() {
               ].map(([label, value]) => (
                 <div key={label} style={{ background: 'var(--gray-surface)', borderRadius: 'var(--radius-md)', padding: '10px 14px', border: '1px solid var(--gray-border)' }}>
                   <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 3 }}>{label}</p>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--black)' }}>{value}</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--black)' }}>
+                    {typeof value === 'object' ? '—' : (value || '—')}
+                  </p>
                 </div>
               ))}
             </div>
