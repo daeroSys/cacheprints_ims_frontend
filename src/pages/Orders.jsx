@@ -143,8 +143,8 @@ export default function Orders() {
     { key: 'customer', label: 'Customer', render: (v, row) => (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
         <p style={{ fontWeight: 700, color: 'var(--black)', fontSize: 13, lineHeight: 1.2 }}>{v}</p>
-        <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || '—'}</p>
-        <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || row.design || '—'}</p>
+        <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || row.design || '—'}</p>
+        <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || '—'}</p>
       </div>
     )},
     { key: 'rows', label: 'Items', render: (v, row) => <span style={{ fontSize: 12 }}>{(v || row.items || []).length} row{(v || row.items || []).length !== 1 ? 's' : ''}</span> },
@@ -168,8 +168,8 @@ export default function Orders() {
     { key: 'customer', label: 'Customer', render: (v, row) => (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
         <p style={{ fontWeight: 700, color: 'var(--black)', fontSize: 13, lineHeight: 1.2 }}>{v}</p>
-        <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || '—'}</p>
-        <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || row.design || '—'}</p>
+        <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || row.design || '—'}</p>
+        <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || '—'}</p>
       </div>
     )},
     { key: 'completedAt', label: 'Completed', render: v => formatDate(v) },

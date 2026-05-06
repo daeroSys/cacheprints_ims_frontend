@@ -326,10 +326,16 @@ export default function Production() {
                       </div>
                       <div style={{ display:'flex', flexDirection:'column', gap:2, marginBottom:10 }}>
                         <span style={{ fontWeight:700, color:'var(--gray-dark)', fontSize:13 }}>{order.customer}</span>
-                        {order.teamName && <span style={{ fontSize:11, color:'var(--gray-mid)' }}>Team: {order.teamName}</span>}
+                        {(order.teamName || order.design) && (
+                          <span style={{ fontSize:11, color:'var(--gray-mid)' }}>
+                            Team: {order.teamName || order.design}
+                          </span>
+                        )}
                         {order.productType && <span style={{ fontSize:10, color:'var(--primary)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.02em' }}>{order.productType}</span>}
                       </div>
-                      <p className="prod-card__design">{order.design}</p>
+                      {order.design && order.design !== (order.teamName || order.design) && (
+                        <p className="prod-card__design">{order.design}</p>
+                      )}
                       <p style={{ fontSize:11, color:'var(--gray-mid)', marginBottom:6 }}>{totalPcs} pieces · Due {formatDate(order.deadline)}</p>
                       <div className="prod-card__footer">
                         {!isLast && (
