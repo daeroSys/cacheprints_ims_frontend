@@ -1,4 +1,11 @@
-node_modules
-dist
+node_modules/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+dist/
+build/
+*.log
+.vscode/
 .DS_Store
-*.local
