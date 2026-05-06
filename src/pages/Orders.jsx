@@ -502,16 +502,19 @@ export default function Orders() {
                         )
                       })}
                       {/* Fallback for legacy item-format orders */}
-                      {(viewModal.rows || []).length === 0 && (viewModal.items || []).map((item, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid var(--gray-border)', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
-                          <td style={{ padding: '10px 14px', fontWeight: 600 }}>{item.no || '--'}</td>
+                      {(viewModal.rows || []).length === 0 && (viewModal.items || []).map((item, i) => {
+                        if (!item) return null;
+                        return (
+                          <tr key={i} style={{ borderBottom: '1px solid var(--gray-border)', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
+                            <td style={{ padding: '10px 14px', fontWeight: 600 }}>{item.no || '--'}</td>
                           <td style={{ padding: '10px 14px', fontWeight: 600 }}>{item.name || '--'}</td>
                           <td style={{ padding: '10px 14px' }} colSpan={2}>
                             {Object.entries(item.sizes || {}).filter(([, v]) => v > 0).map(([sz, qty]) => `${sz}×${qty}`).join(', ') || '--'}
                           </td>
                           <td style={{ padding: '10px 14px', textAlign: 'right' }}>--</td>
                         </tr>
-                      ))}
+                        );
+                      })}
                       {/* Total row */}
                       <tr style={{ background: '#0d0d0d' }}>
                         <td colSpan={5} style={{ padding: '10px 14px', fontWeight: 700, fontSize: 13, color: 'rgba(255,255,255,0.7)', textAlign: 'right', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Total Amount</td>
@@ -552,9 +555,11 @@ export default function Orders() {
             {(viewModal.designFiles || []).length > 0 && (
               <div style={{ marginBottom: 4 }}>
                 <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--black)', marginBottom: 8 }}>Design Files</p>
-                {(viewModal.designFiles || []).map(f => (
-                  <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--gray-surface)', borderRadius: 'var(--radius-md)', marginBottom: 6, border: '1px solid var(--gray-border)' }}>
-                    <div style={{ width: 32, height: 32, background: 'var(--black)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, flexShrink: 0 }}>◈</div>
+                {(viewModal.designFiles || []).map(f => {
+                  if (!f) return null;
+                  return (
+                    <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--gray-surface)', borderRadius: 'var(--radius-md)', marginBottom: 6, border: '1px solid var(--gray-border)' }}>
+                      <div style={{ width: 32, height: 32, background: 'var(--black)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, flexShrink: 0 }}>◈</div>
                     <div style={{ flex: 1 }}>
                       {f.url
                         ? <a href={f.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 600, color: '#1565c0', textDecoration: 'underline' }}>{f.name}</a>
