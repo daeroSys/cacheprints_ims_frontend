@@ -453,18 +453,19 @@ export default function Orders() {
                         return (
                           <tr key={i} style={{ borderBottom: '1px solid var(--gray-border)', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
                             <td style={{ padding: '10px 14px', fontWeight: 600 }}>{row.no || '--'}</td>
-                            <td style={{ padding: '10px 14px', fontWeight: 600 }}>{row.name || '--'}</td>
+                            <td style={{ padding: '10px 14px', fontWeight: 600 }}>{typeof row.name === 'object' ? (row.name.name || '—') : (row.name || '--')}</td>
                             <td style={{ padding: '10px 14px' }}>
                               {row.upperSize && row.lowerSize && row.upperSize === row.lowerSize 
                                 ? row.upperSize 
                                 : `${row.upperSize || '--'}${row.lowerSize ? ` / ${row.lowerSize}` : ''}`}
                             </td>
                             <td style={{ padding: '10px 14px', color: 'var(--gray-mid)' }}>
-                              {row.upperType || viewModal.productType || '--'}
-                              {row.lowerType && row.lowerType !== row.upperType && ` / ${row.lowerType}`}
+                              {(typeof row.upperType === 'object' ? row.upperType.name : row.upperType) || 
+                               (typeof viewModal.productType === 'object' ? viewModal.productType.name : viewModal.productType) || '--'}
+                              {row.lowerType && row.lowerType !== row.upperType && ` / ${typeof row.lowerType === 'object' ? row.lowerType.name : row.lowerType}`}
                               <span style={{ fontSize: 10, marginLeft: 5, color: 'var(--gray-light)' }}>({formatCurrency(up || 650)})</span>
                             </td>
-                            <td style={{ padding: '10px 14px', color: 'var(--gray-mid)' }}>{row.addOn || '--'}</td>
+                            <td style={{ padding: '10px 14px', color: 'var(--gray-mid)' }}>{typeof row.addOn === 'object' ? (row.addOn.name || '—') : (row.addOn || '--')}</td>
                             <td style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 700, color: 'var(--black)', whiteSpace: 'nowrap' }}>
                               {addOnP > 0 ? (
                                 <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
