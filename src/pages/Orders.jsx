@@ -406,8 +406,8 @@ export default function Orders() {
                 ['Contact', viewModal.contact || '—'],
                 ['Design', ['Order Received', 'Designing'].includes(viewModal.status) ? '' : (viewModal.design || '—')],
                 ['Status', viewModal.status],
-                ['Amount Paid', formatCurrency(viewModal.totalAmount)],
-                ['Balance', formatCurrency(0)],
+                ['Amount Paid', formatCurrency(viewModal.paidAmount || 0)],
+                ['Balance', formatCurrency(Math.max(0, (viewModal.totalAmount || 0) - (viewModal.paidAmount || 0)))],
                 ['Deadline', formatDate(viewModal.deadline)],
                 ['Created', formatDate(viewModal.createdAt)],
                 ['Completed', viewModal.completedAt ? formatDate(viewModal.completedAt) : '—'],
@@ -445,9 +445,14 @@ export default function Orders() {
                           <tr key={i} style={{ borderBottom: '1px solid var(--gray-border)', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
                             <td style={{ padding: '10px 14px', fontWeight: 600 }}>{row.no || '--'}</td>
                             <td style={{ padding: '10px 14px', fontWeight: 600 }}>{row.name || '--'}</td>
-                            <td style={{ padding: '10px 14px' }}>{row.upperSize || '--'}</td>
+                            <td style={{ padding: '10px 14px' }}>
+                              {row.upperSize && row.lowerSize && row.upperSize === row.lowerSize 
+                                ? row.upperSize 
+                                : `${row.upperSize || '--'}${row.lowerSize ? ` / ${row.lowerSize}` : ''}`}
+                            </td>
                             <td style={{ padding: '10px 14px', color: 'var(--gray-mid)' }}>
-                              {row.upperType || '--'}
+                              {row.upperType || viewModal.productType || '--'}
+                              {row.lowerType && row.lowerType !== row.upperType && ` / ${row.lowerType}`}
                               <span style={{ fontSize: 10, marginLeft: 5, color: 'var(--gray-light)' }}>({formatCurrency(up || 650)})</span>
                             </td>
                             <td style={{ padding: '10px 14px', color: 'var(--gray-mid)' }}>{row.addOn || '--'}</td>
