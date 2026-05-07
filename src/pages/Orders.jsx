@@ -157,7 +157,13 @@ export default function Orders() {
       key: 'id', label: '', render: (_, row) => (
         <div className="td-actions">
           <button className="td-btn" style={{ color: '#1565c0', fontWeight: 600 }} onClick={() => setViewModal(row)}>View Details</button>
-          <button className="td-btn" onClick={() => { setSelected(row); setEditForm({ ...row }); setErrors({}); setModal('update') }}>Update</button>
+          <button className="td-btn" onClick={() => { 
+            setSelected(row); 
+            const cName = typeof row.customer === 'object' ? (row.customerName || '—') : (row.customer || '—');
+            setEditForm({ ...row, customer: cName }); 
+            setErrors({}); 
+            setModal('update') 
+          }}>Update</button>
           <button className="td-btn td-btn--del" onClick={() => guard('archive', () => setArchiveConfirm(row))}>Archive</button>
         </div>
       )
@@ -180,6 +186,13 @@ export default function Orders() {
       key: 'id', label: '', render: (_, row) => (
         <div className="td-actions">
           <button className="td-btn" style={{ color: '#1565c0', fontWeight: 600 }} onClick={() => setViewModal(row)}>View Details</button>
+          <button className="td-btn" style={{ color: 'var(--primary)', fontWeight: 600 }} onClick={() => { 
+            setSelected(row); 
+            const cName = typeof row.customer === 'object' ? (row.customerName || '—') : (row.customer || '—');
+            setEditForm({ ...row, customer: cName }); 
+            setErrors({}); 
+            setModal('reorder') 
+          }}>Re-order</button>
           <button className="td-btn td-btn--del" onClick={() => guard('archive', () => setArchiveConfirm(row))}>Archive</button>
         </div>
       )
@@ -299,18 +312,15 @@ export default function Orders() {
               {errors.deadline && <p className="field-error">{errors.deadline}</p>}
             </div>
           </div>
+          <div className="form-row">
             <div className="form-group">
               <label className="form-label">Status {!isAdmin && <span style={{ fontSize: 10, background: '#fdecea', color: '#c62828', borderRadius: 4, padding: '1px 6px', marginLeft: 6, fontWeight: 600 }}>Admin Only</span>}</label>
               {isAdmin ? (
                 <select className="form-select" value={editForm.status} onChange={e => {
                   ef('status', e.target.value)
-                  if (e.target.value === '__complete__') {
-                    setCompleteAmt(Math.max(0, (selected.totalAmount || 0) - (selected.paidAmount || 0)))
-                  }
                 }}>
                   {PRODUCTION_STAGES.map(s => <option key={s}>{s}</option>)}
                 </select>
-
               ) : (
                 <input className="form-input" value={editForm.status || ''} disabled style={{ background: 'var(--gray-surface)', color: 'var(--gray-mid)', cursor: 'not-allowed' }} />
               )}
@@ -411,7 +421,7 @@ export default function Orders() {
               <div>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Job Order</p>
                 <p style={{ fontSize: 22, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', marginBottom: 2 }}>{viewModal.orderId}</p>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>{typeof viewModal.customer === 'object' ? '—' : viewModal.customer}</p>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>{typeof viewModal.customer === 'object' ? (viewModal.customerName || '—') : (viewModal.customer || '—')}</p>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Total Amount</p>
@@ -589,7 +599,7 @@ export default function Orders() {
       <ConfirmModal
         open={!!archiveConfirm}
         title="Archive Order"
-        message={`Archive order "${archiveConfirm?.id}" for ${archiveConfirm?.customer}? It will be moved to the Archive and can be restored.`}
+        message={`Archive order "${archiveConfirm?.orderId || archiveConfirm?.id}" for ${typeof archiveConfirm?.customer === 'object' ? (archiveConfirm.customerName || '—') : (archiveConfirm?.customer || '—')}? It will be moved to the Archive and can be restored.`}
         onConfirm={doArchive}
         onCancel={() => setArchiveConfirm(null)}
         confirmLabel="Archive"
