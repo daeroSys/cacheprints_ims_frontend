@@ -153,7 +153,7 @@ export default function DesignFiles() {
         isJOS: true 
       })
     }
-    if (order.customizationDetails?.logoImage) {
+    if (order?.customizationDetails?.logoImage) {
       virtualFiles.push({
         id: 'logo-image',
         name: 'Customer Logo',
