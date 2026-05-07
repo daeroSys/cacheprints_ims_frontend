@@ -105,25 +105,6 @@ export default function Orders() {
     }
   }
 
-  /* ── Re-order ── */
-  const handleReorder = async () => {
-    if (!editForm.deadline) { setErrors({ deadline: 'Deadline is required.' }); return }
-    const payload = {
-      ...editForm,
-      orderId: generateId('ORD'),
-      status: 'Order Received',
-      paidAmount: Number(editForm.paidAmount) || 0,
-      totalAmount: Number(editForm.totalAmount) || 0,
-    }
-    const res = await post('/orders', payload)
-    if (res.ok) {
-      addOrder({ ...res.order, id: res.order._id })
-      setModal(null)
-    } else {
-      alert(res.error || 'Failed to place re-order.')
-    }
-  }
-
   /* ── Archive confirm ── */
   const doArchive = async () => {
     if (archiveConfirm) {
@@ -186,13 +167,6 @@ export default function Orders() {
       key: 'id', label: '', render: (_, row) => (
         <div className="td-actions">
           <button className="td-btn" style={{ color: '#1565c0', fontWeight: 600 }} onClick={() => setViewModal(row)}>View Details</button>
-          <button className="td-btn" style={{ color: 'var(--primary)', fontWeight: 600 }} onClick={() => { 
-            setSelected(row); 
-            const cName = typeof row.customer === 'object' ? (row.customerName || '—') : (row.customer || '—');
-            setEditForm({ ...row, customer: cName }); 
-            setErrors({}); 
-            setModal('reorder') 
-          }}>Re-order</button>
           <button className="td-btn td-btn--del" onClick={() => guard('archive', () => setArchiveConfirm(row))}>Archive</button>
         </div>
       )
@@ -374,43 +348,6 @@ export default function Orders() {
 
 
 
-      {/* ── Re-order Modal ── */}
-      <Modal open={modal === 'reorder'} onClose={() => setModal(null)} title={`Re-order — ${selected?.customer}`} size="sm">
-        {editForm && <>
-          <div style={{ background: '#e3f2fd', borderRadius: 'var(--radius-md)', padding: '10px 14px', marginBottom: 14, fontSize: 13, color: '#1565c0' }}>
-            Creating a new order based on <strong>{selected?.id}</strong>.
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Customer *</label>
-              <input className="form-input" value={editForm.customer} onChange={e => ef('customer', e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Team Name</label>
-              <input className="form-input" value={editForm.teamName || ''} onChange={e => ef('teamName', e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Deadline *</label>
-              <input className={`form-input ${errors.deadline ? 'input-error' : ''}`} type="date" value={editForm.deadline} onChange={e => ef('deadline', e.target.value)} />
-              {errors.deadline && <p className="field-error">{errors.deadline}</p>}
-            </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Grand Total (₱)</label>
-              <input className="form-input" type="number" value={editForm.totalAmount} onChange={e => ef('totalAmount', Number(e.target.value) || 0)} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Down Payment (₱)</label>
-              <input className="form-input" type="number" value={editForm.paidAmount} onChange={e => ef('paidAmount', Number(e.target.value) || 0)} />
-            </div>
-          </div>
-          <div className="modal-actions">
-            <button className="btn btn-secondary" onClick={() => setModal(null)}>Cancel</button>
-            <button className="btn btn-primary" onClick={handleReorder}>Place Re-order</button>
-          </div>
-        </>}
-      </Modal>
 
       {/* ── View Details Modal ── */}
       <Modal open={!!viewModal} onClose={() => setViewModal(null)} title="" size="lg">
