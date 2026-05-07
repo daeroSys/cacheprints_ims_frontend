@@ -152,16 +152,7 @@ export default function Orders() {
     { key: 'deadline', label: 'Deadline', render: (v, row) => { const d = getDaysUntil(v); return <span style={{ color: d <= 3 ? '#c62828' : 'inherit', fontWeight: d <= 3 ? 600 : 400 }}>{formatDate(v)}{d <= 0 ? ' ⚠' : d <= 3 ? ` (${d}d)` : ''}</span> } },
     { key: 'status', label: 'Status', render: v => <Badge status={getStatusColor(v)}>{v}</Badge> },
     { key: 'payment', label: 'Payment', render: v => <Badge status={getStatusColor(v)}>{v}</Badge> },
-    { key: 'totalAmount', label: 'Amount', render: (v, row) => {
-      const total = Number(v || row.totalPrice) || 0
-      const paid = Number(row.paidAmount) || 0
-      return (
-        <div>
-          <p>{formatCurrency(total)}</p>
-          <p style={{ fontSize: 12, color: 'var(--gray-mid)' }}>Balance: {formatCurrency(Math.max(0, total - paid))}</p>
-        </div>
-      )
-    }},
+    { key: 'totalAmount', label: 'Amount', render: (v, row) => <div><p>{formatCurrency(v || row.totalPrice)}</p><p style={{ fontSize: 12, color: 'var(--gray-mid)' }}>Balance: {formatCurrency(Math.max(0, (v || row.totalPrice || 0) - (row.paidAmount || 0)))}</p></div> },
     {
       key: 'id', label: '', render: (_, row) => (
         <div className="td-actions">
@@ -190,7 +181,7 @@ export default function Orders() {
     )},
     { key: 'completedAt', label: 'Completed', render: v => formatDate(v) },
     { key: 'payment', label: 'Payment', render: (v, row) => <Badge status="status-green">Paid</Badge> },
-    { key: 'totalAmount', label: 'Amount', render: (v, row) => <div><p>{formatCurrency(Number(v) || 0)}</p><p style={{ fontSize: 12, color: '#2e7d32' }}>{formatCurrency(Number(v) || 0)} received</p></div> },
+    { key: 'totalAmount', label: 'Amount', render: (v, row) => <div><p>{formatCurrency(v)}</p><p style={{ fontSize: 12, color: '#2e7d32' }}>{formatCurrency(v)} received</p></div> },
     {
       key: 'id', label: '', render: (_, row) => (
         <div className="td-actions">
@@ -487,10 +478,10 @@ export default function Orders() {
                       {(viewModal.rows || []).map((row, i) => {
                         if (!row) return null;
                         const count = (viewModal.rows?.length) || 1;
-                        const totalAddons = (viewModal.rows || []).reduce((s, r) => s + (Number(r?.addOnPrice) || 0), 0);
-                        const baseAmt = Number(viewModal.totalAmount || viewModal.totalPrice) || 0;
+                        const totalAddons = (viewModal.rows || []).reduce((s, r) => s + (r?.addOnPrice || 0), 0);
+                        const baseAmt = viewModal.totalAmount || viewModal.totalPrice || 0;
                         const derivedBase = (baseAmt - totalAddons) / count;
-                        const up = Number(viewModal.upperPrice) || (derivedBase > 0 ? derivedBase : 650);
+                        const up = viewModal.upperPrice || (derivedBase > 0 ? derivedBase : 650);
 
                         const addOnP = row.addOnPrice || 0
                         const amt = (up > 0 ? up : 0) + addOnP
@@ -544,10 +535,10 @@ export default function Orders() {
                           {(() => {
                             const computed = (viewModal.rows || []).reduce((s, r) => {
                               if (!r) return s;
-                              const up = Number(viewModal.upperPrice) || 450, lp = Number(viewModal.lowerPrice) || 450
+                              const up = viewModal.upperPrice || 450, lp = viewModal.lowerPrice || 450
                               return s + (r.upperType && r.upperSize ? up : 0) + (r.lowerType && r.lowerSize ? lp : 0)
                             }, 0)
-                            const totalAmt = Number(viewModal.totalAmount || viewModal.totalPrice) || computed
+                            const totalAmt = viewModal.totalAmount || viewModal.totalPrice || computed
                             return formatCurrency(totalAmt)
                           })()}
                         </td>
@@ -557,7 +548,7 @@ export default function Orders() {
                 </div>
                 {!viewModal.externalRef && (
                   <p style={{ fontSize: 11, color: 'var(--gray-mid)', marginTop: 6 }}>
-                    Upper: {formatCurrency(Number(viewModal.upperPrice) || 450)}/pc · Lower: {formatCurrency(Number(viewModal.lowerPrice) || 450)}/pc
+                    Upper: {formatCurrency(viewModal.upperPrice || 450)}/pc · Lower: {formatCurrency(viewModal.lowerPrice || 450)}/pc
                   </p>
                 )}
               </div>
@@ -575,20 +566,20 @@ export default function Orders() {
             )}
 
             {/* ── Design files ── */}
-            {Array.isArray(viewModal.designFiles) && viewModal.designFiles.length > 0 && (
+            {(viewModal.designFiles || []).length > 0 && (
               <div style={{ marginBottom: 4 }}>
                 <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--black)', marginBottom: 8 }}>Design Files</p>
-                {viewModal.designFiles.map(f => {
+                {(viewModal.designFiles || []).map(f => {
                   if (!f) return null;
                   return (
-                    <div key={f.id || Math.random()} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--gray-surface)', borderRadius: 'var(--radius-md)', marginBottom: 6, border: '1px solid var(--gray-border)' }}>
+                    <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--gray-surface)', borderRadius: 'var(--radius-md)', marginBottom: 6, border: '1px solid var(--gray-border)' }}>
                       <div style={{ width: 32, height: 32, background: 'var(--black)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, flexShrink: 0 }}>◈</div>
                     <div style={{ flex: 1 }}>
                       {f.url
-                        ? <a href={String(f.url)} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 600, color: '#1565c0', textDecoration: 'underline' }}>{String(f.name || 'Untitled File')}</a>
-                        : <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--black)' }}>{String(f.name || 'Untitled File')}</span>
+                        ? <a href={f.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 600, color: '#1565c0', textDecoration: 'underline' }}>{f.name}</a>
+                        : <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--black)' }}>{f.name}</span>
                       }
-                      {f.notes && <p style={{ fontSize: 11, color: 'var(--gray-mid)', marginTop: 1 }}>{String(f.notes)}</p>}
+                      {f.notes && <p style={{ fontSize: 11, color: 'var(--gray-mid)', marginTop: 1 }}>{f.notes}</p>}
                     </div>
                     <span style={{ fontSize: 11, color: 'var(--gray-light)' }}>{formatDate(f.uploadedAt)}</span>
                   </div>
