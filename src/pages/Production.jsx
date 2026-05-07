@@ -334,7 +334,7 @@ export default function Production() {
                         </Badge>
                       </div>
                       <div style={{ display:'flex', flexDirection:'column', gap:2, marginBottom:10 }}>
-                        <span style={{ fontWeight:700, color:'var(--gray-dark)', fontSize:13 }}>{order.customer}</span>
+                        <span style={{ fontWeight:700, color:'var(--gray-dark)', fontSize:13 }}>{typeof order.customer === 'object' ? (order.customerName || '—') : (order.customer || '—')}</span>
                         {(order.teamName || order.design) && (
                           <span style={{ fontSize:11, color:'var(--gray-mid)' }}>
                             Team: {order.teamName || order.design}
@@ -345,7 +345,17 @@ export default function Production() {
                       {order.design && order.design !== (order.teamName || order.design) && (
                         <p className="prod-card__design">{order.design}</p>
                       )}
-                      <p style={{ fontSize:11, color:'var(--gray-mid)', marginBottom:6 }}>Due {formatDate(order.deadline)}</p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <p style={{ fontSize:11, color:'var(--gray-mid)' }}>Due {formatDate(order.deadline)}</p>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--black)', background: 'var(--gray-surface)', padding: '2px 8px', borderRadius: 4 }}>
+                          {(() => {
+                            const count = (order.rows?.length) || 
+                                          (order.items || []).reduce((sum, item) => sum + Object.values(item.sizes || {}).reduce((s, q) => s + (Number(q) || 0), 0), 0) || 
+                                          0;
+                            return `${count} pc${count !== 1 ? 's' : ''}`;
+                          })()}
+                        </span>
+                      </div>
                       <div className="prod-card__footer">
                         {!isLast && (
                           si === 0 ? (
