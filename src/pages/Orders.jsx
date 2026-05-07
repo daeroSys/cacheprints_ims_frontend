@@ -574,16 +574,17 @@ export default function Orders() {
                   return (
                     <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--gray-surface)', borderRadius: 'var(--radius-md)', marginBottom: 6, border: '1px solid var(--gray-border)' }}>
                       <div style={{ width: 32, height: 32, background: 'var(--black)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, flexShrink: 0 }}>◈</div>
-                    <div style={{ flex: 1 }}>
-                      {f.url
-                        ? <a href={f.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 600, color: '#1565c0', textDecoration: 'underline' }}>{f.name}</a>
-                        : <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--black)' }}>{f.name}</span>
-                      }
-                      {f.notes && <p style={{ fontSize: 11, color: 'var(--gray-mid)', marginTop: 1 }}>{f.notes}</p>}
+                      <div style={{ flex: 1 }}>
+                        {f.url
+                          ? <a href={f.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 600, color: '#1565c0', textDecoration: 'underline' }}>{f.name}</a>
+                          : <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--black)' }}>{f.name}</span>
+                        }
+                        {f.notes && <p style={{ fontSize: 11, color: 'var(--gray-mid)', marginTop: 1 }}>{f.notes}</p>}
+                      </div>
+                      <span style={{ fontSize: 11, color: 'var(--gray-light)' }}>{formatDate(f.uploadedAt)}</span>
                     </div>
-                    <span style={{ fontSize: 11, color: 'var(--gray-light)' }}>{formatDate(f.uploadedAt)}</span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
 
