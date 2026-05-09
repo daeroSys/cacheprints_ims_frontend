@@ -54,8 +54,9 @@ export default function Orders() {
     return `${fmt(range.from)} – ${fmt(range.to)}`
   }, [range])
 
-  const pending = orders.filter(o => !o.isCompleted && !o.isArchived)
+  const pending = orders.filter(o => !o.isCompleted && !o.isArchived && o.status !== 'cancelled')
   const completed = orders.filter(o => o.isCompleted && !o.isArchived)
+  const cancelled = orders.filter(o => o.status === 'cancelled' && !o.isArchived)
 
   const filterList = (list, isCompleted = false) => list.filter(o => {
     const term = search.toLowerCase()
@@ -63,7 +64,7 @@ export default function Orders() {
     const ms = custName.toLowerCase().includes(term) ||
       (o.teamName || '').toLowerCase().includes(term) ||
       (o.orderId || '').toLowerCase().includes(term)
-    
+
     // Status filter only for pending
     if (!isCompleted) {
       const mf = stFilter === 'All' || o.status === stFilter
@@ -77,6 +78,7 @@ export default function Orders() {
 
   const pgPending = usePagination(filterList(pending, false), 10)
   const pgCompleted = usePagination(filterList(completed, true), 10)
+  const pgCancelled = usePagination(filterList(cancelled, false), 10)
 
   const totalDue = (o) => Math.max(0, (o.totalAmount || 0) - (o.paidAmount || 0))
 
@@ -122,13 +124,15 @@ export default function Orders() {
   /* ── Table columns ── */
   const pendingCols = [
     { key: 'orderId', label: 'Order ID', render: v => <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 13 }}>{v}</span> },
-    { key: 'customer', label: 'Customer', render: (v, row) => (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        <p style={{ fontWeight: 700, color: 'var(--black)', fontSize: 13, lineHeight: 1.2 }}>{typeof v === 'object' ? (row.customerName || '—') : (v || '—')}</p>
-        <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || row.design || '—'}</p>
-        <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || '—'}</p>
-      </div>
-    )},
+    {
+      key: 'customer', label: 'Customer', render: (v, row) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <p style={{ fontWeight: 700, color: 'var(--black)', fontSize: 13, lineHeight: 1.2 }}>{typeof v === 'object' ? (row.customerName || '—') : (v || '—')}</p>
+          <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || row.design || '—'}</p>
+          <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || '—'}</p>
+        </div>
+      )
+    },
     { key: 'rows', label: 'Items', render: (v, row) => <span style={{ fontSize: 12 }}>{(v || row.items || []).length} row{(v || row.items || []).length !== 1 ? 's' : ''}</span> },
     { key: 'deadline', label: 'Deadline', render: (v, row) => { const d = getDaysUntil(v); return <span style={{ color: d <= 3 ? '#c62828' : 'inherit', fontWeight: d <= 3 ? 600 : 400 }}>{formatDate(v)}{d <= 0 ? ' ⚠' : d <= 3 ? ` (${d}d)` : ''}</span> } },
     { key: 'status', label: 'Status', render: v => <Badge status={getStatusColor(v)}>{v}</Badge> },
@@ -138,12 +142,12 @@ export default function Orders() {
       key: 'id', label: '', render: (_, row) => (
         <div className="td-actions">
           <button className="td-btn" style={{ color: '#1565c0', fontWeight: 600 }} onClick={() => setViewModal(row)}>View Details</button>
-          <button className="td-btn" onClick={() => { 
-            setSelected(row); 
+          <button className="td-btn" onClick={() => {
+            setSelected(row);
             const cName = typeof row.customer === 'object' ? (row.customerName || '—') : (row.customer || '—');
-            setEditForm({ ...row, customer: cName }); 
-            setErrors({}); 
-            setModal('update') 
+            setEditForm({ ...row, customer: cName });
+            setErrors({});
+            setModal('update')
           }}>Update</button>
           <button className="td-btn td-btn--del" onClick={() => guard('archive', () => setArchiveConfirm(row))}>Archive</button>
         </div>
@@ -153,16 +157,55 @@ export default function Orders() {
 
   const completedCols = [
     { key: 'orderId', label: 'Order ID', render: v => <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 13 }}>{v}</span> },
-    { key: 'customer', label: 'Customer', render: (v, row) => (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        <p style={{ fontWeight: 700, color: 'var(--black)', fontSize: 13, lineHeight: 1.2 }}>{typeof v === 'object' ? (row.customerName || '—') : (v || '—')}</p>
-        <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || row.design || '—'}</p>
-        <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || '—'}</p>
-      </div>
-    )},
+    {
+      key: 'customer', label: 'Customer', render: (v, row) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <p style={{ fontWeight: 700, color: 'var(--black)', fontSize: 13, lineHeight: 1.2 }}>{typeof v === 'object' ? (row.customerName || '—') : (v || '—')}</p>
+          <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || row.design || '—'}</p>
+          <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || '—'}</p>
+        </div>
+      )
+    },
     { key: 'completedAt', label: 'Completed', render: v => formatDate(v) },
     { key: 'payment', label: 'Payment', render: (v, row) => <Badge status="status-green">Paid</Badge> },
     { key: 'totalAmount', label: 'Amount', render: (v, row) => <div><p>{formatCurrency(v)}</p><p style={{ fontSize: 12, color: '#2e7d32' }}>{formatCurrency(v)} received</p></div> },
+    {
+      key: 'id', label: '', render: (_, row) => (
+        <div className="td-actions">
+          <button className="td-btn" style={{ color: '#1565c0', fontWeight: 600 }} onClick={() => setViewModal(row)}>View Details</button>
+          <button className="td-btn td-btn--del" onClick={() => guard('archive', () => setArchiveConfirm(row))}>Archive</button>
+        </div>
+      )
+    },
+  ]
+
+  const cancelledCols = [
+    { key: 'orderId', label: 'Order ID', render: v => <span style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 13 }}>{v}</span> },
+    {
+      key: 'customer', label: 'Customer', render: (v, row) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <p style={{ fontWeight: 700, color: 'var(--black)', fontSize: 13, lineHeight: 1.2 }}>{typeof v === 'object' ? (row.customerName || '—') : (v || '—')}</p>
+          <p style={{ fontSize: 11, color: '#444', fontWeight: 600 }}>{row.teamName || row.design || '—'}</p>
+          <p style={{ fontSize: 10, color: 'var(--gray-mid)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{row.productType || '—'}</p>
+        </div>
+      )
+    },
+    {
+      key: 'cancelledAt', label: 'Cancelled', render: (v, row) => (
+        <div>
+          <p style={{ fontSize: 13, fontWeight: 500 }}>{formatDate(v || row.updatedAt)}</p>
+          {row.cancellationReason && <p style={{ fontSize: 11, color: 'var(--gray-mid)', fontStyle: 'italic' }}>"{row.cancellationReason}"</p>}
+        </div>
+      )
+    },
+    {
+      key: 'totalAmount', label: 'Revenue Retained', render: (v, row) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontWeight: 600 }}>{formatCurrency(v || 0)}</span>
+          {Number(v) >= 500 && <Badge status="status-green">✓ Revenue</Badge>}
+        </div>
+      )
+    },
     {
       key: 'id', label: '', render: (_, row) => (
         <div className="td-actions">
@@ -178,14 +221,18 @@ export default function Orders() {
       <PageHeader title="Job Orders" subtitle="Manage all active and completed job orders" />
 
       <div className="oh-tabs animate-fade-up">
-        {[{ key: 'pending', label: `Active Orders (${pending.length})` }, { key: 'completed', label: `Completed (${completed.length})` }].map(t => (
+        {[
+          { key: 'pending', label: `Active Orders (${pending.length})` },
+          { key: 'completed', label: `Completed (${completed.length})` },
+          { key: 'cancelled', label: `Cancelled (${cancelled.length})` }
+        ].map(t => (
           <button key={t.key} className={`archive-tab ${tab === t.key ? 'archive-tab--active' : ''}`} onClick={() => setTab(t.key)}>{t.label}</button>
         ))}
       </div>
 
       <div className="page-toolbar animate-fade-up delay-1" style={tab === 'completed' ? { flexDirection: 'column', alignItems: 'flex-start', gap: 10 } : {}}>
         <input className="toolbar-search" placeholder="Search customer or team name" value={search} onChange={e => { setSearch(e.target.value); pgPending.setPage(1); pgCompleted.setPage(1); }} />
-        
+
         {tab === 'pending' && (
           <div className="toolbar-filters">
             {['All', ...PRODUCTION_STAGES].map(s => (
@@ -221,6 +268,7 @@ export default function Orders() {
       <div className="animate-fade-up delay-2">
         {tab === 'pending' && <><DataTable columns={pendingCols} data={pgPending.paginated} emptyText="No active orders." /><Pagination page={pgPending.page} totalPages={pgPending.totalPages} setPage={pgPending.setPage} total={pgPending.total} pageSize={10} /></>}
         {tab === 'completed' && <><DataTable columns={completedCols} data={pgCompleted.paginated} emptyText="No completed orders." /><Pagination page={pgCompleted.page} totalPages={pgCompleted.totalPages} setPage={pgCompleted.setPage} total={pgCompleted.total} pageSize={10} /></>}
+        {tab === 'cancelled' && <><DataTable columns={cancelledCols} data={pgCancelled.paginated} emptyText="No cancelled orders." /><Pagination page={pgCancelled.page} totalPages={pgCancelled.totalPages} setPage={pgCancelled.setPage} total={pgCancelled.total} pageSize={10} /></>}
       </div>
 
 
@@ -427,13 +475,13 @@ export default function Orders() {
                             <td style={{ padding: '10px 14px', fontWeight: 600 }}>{row.no || '--'}</td>
                             <td style={{ padding: '10px 14px', fontWeight: 600 }}>{row.name && typeof row.name === 'object' ? (row.name.name || '—') : (row.name || '--')}</td>
                             <td style={{ padding: '10px 14px' }}>
-                              {row.upperSize && row.lowerSize && row.upperSize === row.lowerSize 
-                                ? row.upperSize 
+                              {row.upperSize && row.lowerSize && row.upperSize === row.lowerSize
+                                ? row.upperSize
                                 : `${row.upperSize || '--'}${row.lowerSize ? ` / ${row.lowerSize}` : ''}`}
                             </td>
                             <td style={{ padding: '10px 14px', color: 'var(--gray-mid)' }}>
-                              {(row.upperType && typeof row.upperType === 'object' ? row.upperType.name : row.upperType) || 
-                               (viewModal.productType && typeof viewModal.productType === 'object' ? viewModal.productType.name : viewModal.productType) || '--'}
+                              {(row.upperType && typeof row.upperType === 'object' ? row.upperType.name : row.upperType) ||
+                                (viewModal.productType && typeof viewModal.productType === 'object' ? viewModal.productType.name : viewModal.productType) || '--'}
                               {row.lowerType && row.lowerType !== row.upperType && ` / ${row.lowerType && typeof row.lowerType === 'object' ? row.lowerType.name : row.lowerType}`}
                               <span style={{ fontSize: 10, marginLeft: 5, color: 'var(--gray-light)' }}>({formatCurrency(up || 650)})</span>
                             </td>
@@ -457,12 +505,12 @@ export default function Orders() {
                         return (
                           <tr key={i} style={{ borderBottom: '1px solid var(--gray-border)', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
                             <td style={{ padding: '10px 14px', fontWeight: 600 }}>{item.no || '--'}</td>
-                          <td style={{ padding: '10px 14px', fontWeight: 600 }}>{item.name || '--'}</td>
-                          <td style={{ padding: '10px 14px' }} colSpan={2}>
-                            {Object.entries(item.sizes || {}).filter(([, v]) => v > 0).map(([sz, qty]) => `${sz}×${qty}`).join(', ') || '--'}
-                          </td>
-                          <td style={{ padding: '10px 14px', textAlign: 'right' }}>--</td>
-                        </tr>
+                            <td style={{ padding: '10px 14px', fontWeight: 600 }}>{item.name || '--'}</td>
+                            <td style={{ padding: '10px 14px' }} colSpan={2}>
+                              {Object.entries(item.sizes || {}).filter(([, v]) => v > 0).map(([sz, qty]) => `${sz}×${qty}`).join(', ') || '--'}
+                            </td>
+                            <td style={{ padding: '10px 14px', textAlign: 'right' }}>--</td>
+                          </tr>
                         );
                       })}
                       {/* Total row */}
