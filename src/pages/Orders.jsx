@@ -199,12 +199,21 @@ export default function Orders() {
       )
     },
     {
-      key: 'totalAmount', label: 'Revenue Retained', render: (v, row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontWeight: 600 }}>{formatCurrency(v || 0)}</span>
-          {Number(v) >= 500 && <Badge status="status-green">✓ Revenue</Badge>}
-        </div>
-      )
+      key: 'totalAmount', label: 'Revenue Retained', render: (v, row) => {
+        const amount = Number(v);
+        const isPaid = amount >= 500;
+        
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontWeight: 600 }}>{formatCurrency(isPaid ? amount : 0)}</span>
+            {isPaid ? (
+              <Badge status="status-green">✓ Revenue</Badge>
+            ) : (
+              <span style={{ fontSize: 11, color: 'var(--gray-mid)', fontWeight: 600 }}>No Revenue</span>
+            )}
+          </div>
+        );
+      }
     },
     {
       key: 'id', label: '', render: (_, row) => (
