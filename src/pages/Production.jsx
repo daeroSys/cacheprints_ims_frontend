@@ -12,17 +12,13 @@ import './Production.css'
 const EMPTY_MAT_ROW = { materialId:'', materialName:'', qty:'' }
 
 export default function Production() {
-  const { orders, materials, updateOrder, advanceOrderStage, completeOrder, refreshOrders } = useApp()
+  const { orders, materials, updateOrder, advanceOrderStage, completeOrder, refreshAll } = useApp()
   const [stageModal,   setStageModal]   = useState(null)  // { order, stageIdx, nextStage }
   const [formData,     setFormData]     = useState({})
   const [matRows,      setMatRows]      = useState([{ ...EMPTY_MAT_ROW }])
   const [errors,       setErrors]       = useState({})
+  const [refreshing,   setRefreshing]   = useState(false)
 
-  // Polling for updates from JOS
-  useEffect(() => {
-    const interval = setInterval(refreshOrders, 30000)
-    return () => clearInterval(interval)
-  }, [refreshOrders])
 
 
   const activeOrders = orders.filter(o => !o.isCompleted && !o.isArchived)
@@ -303,12 +299,27 @@ export default function Production() {
     )
   }
 
+  const onManualRefresh = async () => {
+    setRefreshing(true)
+    await refreshAll()
+    setTimeout(() => setRefreshing(false), 600)
+  }
+
   return (
     <div>
       <PageHeader 
         title="Production Tracking" 
         subtitle="Track each job order through all production stages"
-        action={<button className="btn btn-secondary" onClick={refreshOrders} style={{ fontSize: 12, padding: '6px 12px' }}>🔄 Sync with JOS</button>}
+        action={
+          <button 
+            className={`btn btn-secondary ${refreshing ? 'btn--loading' : ''}`} 
+            onClick={onManualRefresh}
+            disabled={refreshing}
+            style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+          >
+            {refreshing ? 'Refreshing...' : '🔄 Refresh Data'}
+          </button>
+        }
       />
 
       <div className="production-board animate-fade-up">
