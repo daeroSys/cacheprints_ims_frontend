@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext'
 import StatCard from '../components/ui/StatCard'
 import Badge from '../components/ui/Badge'
 import PageHeader from '../components/ui/PageHeader'
-import { formatCurrency, formatDate, getStatusColor, PERIOD_PRESETS, getPresetRange, inRange } from '../utils/helpers'
+import { formatCurrency, formatDate, getStatusColor, PERIOD_PRESETS, getPresetRange, inRange, toLocalISO } from '../utils/helpers'
 import './Dashboard.css'
 
 export default function Dashboard({ onNav }) {
@@ -11,8 +11,8 @@ export default function Dashboard({ onNav }) {
 
   // ── Period filter ──
   const [period, setPeriod] = useState('today')
-  const [customFrom, setCustomFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().slice(0, 10) })
-  const [customTo, setCustomTo] = useState(() => new Date().toISOString().slice(0, 10))
+  const [customFrom, setCustomFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return toLocalISO(d) })
+  const [customTo, setCustomTo] = useState(() => toLocalISO(new Date()))
 
   const range = useMemo(() => {
     if (period === 'custom') {

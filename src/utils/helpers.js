@@ -53,10 +53,19 @@ export const derivePaymentStatus = (paid, total) => {
 
 export const nowISO = () => new Date().toISOString()
 
+export const toLocalISO = (date) => {
+  const d = new Date(date)
+  const offset = d.getTimezoneOffset()
+  const localDate = new Date(d.getTime() - (offset * 60 * 1000))
+  return localDate.toISOString().split('T')[0]
+}
+
 export const PERIOD_PRESETS = [
   { key: 'today',      label: 'Today' },
+  { key: 'yesterday',  label: 'Yesterday' },
   { key: 'this-week',  label: 'This Week' },
   { key: 'this-month', label: 'This Month' },
+  { key: 'all-time',   label: 'All Time' },
   { key: 'custom',     label: 'Custom Range' },
 ]
 
@@ -66,6 +75,11 @@ export function getPresetRange(key) {
     case 'today': {
       const d = new Date(now); d.setHours(0,0,0,0)
       const e = new Date(now); e.setHours(23,59,59,999)
+      return { from: d, to: e }
+    }
+    case 'yesterday': {
+      const d = new Date(now); d.setDate(now.getDate() - 1); d.setHours(0,0,0,0)
+      const e = new Date(now); e.setDate(now.getDate() - 1); e.setHours(23,59,59,999)
       return { from: d, to: e }
     }
     case 'this-week': {
@@ -79,7 +93,7 @@ export function getPresetRange(key) {
       return { from: s, to: e }
     }
     case 'all-time': {
-      return { from: new Date(2000, 0, 1), to: new Date(now.getFullYear()+10, 0, 1) }
+      return { from: new Date(2000, 0, 1), to: new Date(now.getFullYear() + 10, 0, 1) }
     }
     default: return null
   }

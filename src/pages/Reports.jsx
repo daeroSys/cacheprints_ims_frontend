@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext'
 import PageHeader from '../components/ui/PageHeader'
 import StatCard from '../components/ui/StatCard'
 import Modal from '../components/ui/Modal'
-import { formatCurrency, formatDate, PERIOD_PRESETS, getPresetRange, inRange } from '../utils/helpers'
+import { formatCurrency, formatDate, PERIOD_PRESETS, getPresetRange, inRange, toLocalISO } from '../utils/helpers'
 import { generateReportHTML } from '../utils/reportGenerator'
 import './PageCommon.css'
 import './Reports.css'
@@ -21,8 +21,8 @@ export default function Reports() {
 
   // ── Period filter ──
   const [period, setPeriod] = useState('today')
-  const [customFrom, setCustomFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().slice(0, 10) })
-  const [customTo, setCustomTo] = useState(() => new Date().toISOString().slice(0, 10))
+  const [customFrom, setCustomFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return toLocalISO(d) })
+  const [customTo, setCustomTo] = useState(() => toLocalISO(new Date()))
 
   const range = useMemo(() => {
     if (period === 'custom') {
@@ -103,11 +103,11 @@ export default function Reports() {
   const [viewReceipt, setViewReceipt] = useState(null)
   const [receiptSearch, setReceiptSearch] = useState('')
   const [receiptPeriod, setReceiptPeriod] = useState('this-month') // Initial state: 'this-month' to avoid clutter
-  const [recCustomFrom, setRecCustomFrom] = useState(() => new Date().toISOString().slice(0, 10))
-  const [recCustomTo,   setRecCustomTo]   = useState(() => new Date().toISOString().slice(0, 10))
+  const [recCustomFrom, setRecCustomFrom] = useState(() => toLocalISO(new Date()))
+  const [recCustomTo,   setRecCustomTo]   = useState(() => toLocalISO(new Date()))
   const [reportType, setReportType] = useState('all')
-  const [repFrom, setRepFrom] = useState(() => { const d = new Date(); d.setMonth(d.getMonth() - 1); return d.toISOString().slice(0, 10) })
-  const [repTo, setRepTo] = useState(() => new Date().toISOString().slice(0, 10))
+  const [repFrom, setRepFrom] = useState(() => { const d = new Date(); d.setMonth(d.getMonth() - 1); return toLocalISO(d) })
+  const [repTo, setRepTo] = useState(() => toLocalISO(new Date()))
   const [errors, setErrors] = useState({})
 
   const validateReport = () => {

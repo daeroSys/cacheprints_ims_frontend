@@ -8,7 +8,7 @@ import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
 import Pagination from '../components/ui/Pagination'
 import { usePagination } from '../hooks/usePagination'
-import { formatCurrency, formatDate, generateId, getStatusColor, getDaysUntil, derivePaymentStatus, nowISO, PERIOD_PRESETS, getPresetRange, inRange } from '../utils/helpers'
+import { formatCurrency, formatDate, generateId, getStatusColor, getDaysUntil, derivePaymentStatus, nowISO, PERIOD_PRESETS, getPresetRange, inRange, toLocalISO } from '../utils/helpers'
 import { PRODUCTION_STAGES, SIZE_KEYS, EMPTY_SIZES } from '../utils/constants'
 import { post, put, patch } from '../utils/api'
 import './PageCommon.css'
@@ -41,8 +41,8 @@ export default function Orders() {
 
   // ── Date Filtering (for Completed Tab) ──
   const [period, setPeriod] = useState('today')
-  const [customFrom, setCustomFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().slice(0, 10) })
-  const [customTo, setCustomTo] = useState(() => new Date().toISOString().slice(0, 10))
+  const [customFrom, setCustomFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 7); return toLocalISO(d) })
+  const [customTo, setCustomTo] = useState(() => toLocalISO(new Date()))
 
   const range = useMemo(() => {
     if (period === 'custom') return { from: new Date(customFrom + 'T00:00:00'), to: new Date(customTo + 'T23:59:59') }
