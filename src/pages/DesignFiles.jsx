@@ -61,7 +61,7 @@ export default function DesignFiles() {
         (o.teamName || '').toLowerCase().includes(term) ||
         (o.orderId || '').toLowerCase().includes(term) ||
         (o.design || '').toLowerCase().includes(term)
-      
+
       const dateToCompare = isCompletedTab ? (o.completedAt || o.updatedAt) : o.createdAt
       const matchDate = inRange(dateToCompare, range.from, range.to)
       return matchSearch && matchDate
@@ -173,18 +173,18 @@ export default function DesignFiles() {
                         {f.name}
                       </a>
                       : f.type === 'sheet'
-                        ? <button 
-                            className="df-file-pill__name df-file-pill__name--link" 
-                            style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', font: 'inherit', cursor: 'pointer' }}
-                            onClick={() => setSheetModal(order)}
-                          >
-                            {f.name}
-                          </button>
+                        ? <button
+                          className="df-file-pill__name df-file-pill__name--link"
+                          style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', font: 'inherit', cursor: 'pointer' }}
+                          onClick={() => setSheetModal(order)}
+                        >
+                          {f.name}
+                        </button>
                         : <span className="df-file-pill__name">{f.name}</span>
                     }
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       {f.notes && <span className="df-file-pill__notes">{f.notes}</span>}
-                      {isVirtual && <span style={{ fontSize: 9, background: '#dbeafe', color: '#1e40af', padding: '1px 5px', borderRadius: 4, fontWeight: 700, textTransform: 'uppercase' }}>Synced from JOS</span>}
+                      {isVirtual && <span style={{ fontSize: 7, background: '#dbeafe', color: '#1e40af', padding: '1px 5px', borderRadius: 4, fontWeight: 700, textTransform: 'uppercase' }}>Synced from JOS</span>}
                     </div>
                   </div>
                   <span className="df-file-pill__date">{formatDate(f.uploadedAt)}</span>
