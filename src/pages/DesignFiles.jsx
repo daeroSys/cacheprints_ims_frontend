@@ -126,7 +126,7 @@ export default function DesignFiles() {
     const synthesizedFiles = [
       ...(order.designFiles || []),
       ...(showSheet ? [{ id: 'jo-sheet', name: 'Job Order Sheet', url: null, type: 'sheet', notes: 'System Generated', uploadedAt: order.updatedAt, isJOS: true }] : []),
-      ...(order.paymentReceipt ? [{ id: 'dp-receipt', name: 'Design Fee', url: order.paymentReceipt, type: 'image', notes: 'Payment confirmed by Admin', uploadedAt: order.paymentReceiptDate || order.updatedAt, isJOS: true }] : []),
+      ...(order.paymentReceipt ? [{ id: 'dp-receipt', name: 'Design Fee', url: order.paymentReceipt, type: 'image', notes: 'Design Fee confirmed', uploadedAt: order.paymentReceiptDate || order.updatedAt, isJOS: true }] : []),
       ...(order.finalPaymentReceipt ? [{ id: 'fp-receipt', name: 'Payment for Remaining Balance', url: order.finalPaymentReceipt, type: 'image', notes: 'Final payment confirmed', uploadedAt: order.finalPaymentReceiptDate || order.updatedAt, isJOS: true }] : [])
     ]
 
