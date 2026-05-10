@@ -150,29 +150,6 @@ export default function DesignFiles() {
           {order.design || <em style={{ color: 'var(--gray-light)' }}>No design description</em>}
         </p>
 
-        {(order.designFileUrl || order.finalDesignUrl) && (
-          <div className="df-prod-link">
-            <span style={{ fontSize: 11, color: 'var(--gray-mid)' }}>Job Order:</span>
-            <button
-              onClick={() => setSheetModal(order)}
-              style={{ fontSize: 12, color: '#1565c0', marginLeft: 6, textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}
-            >
-              View Sheet
-            </button>
-          </div>
-        )}
-
-
-
-        <div className="df-card__gallery">
-          {files.filter(f => isImage(f.url)).map(f => (
-            <div key={f.id} className="df-card__thumb" onClick={(e) => handleFileClick(e, f)} title={f.name}>
-              <img src={f.url} alt={f.name} />
-              {f.isJOS && <span className="df-card__thumb-jos">JOS</span>}
-            </div>
-          ))}
-        </div>
-
         <div className="df-card__files">
           {files.length === 0 ? (
             <div className="df-card__no-files"><span>No files attached yet</span></div>

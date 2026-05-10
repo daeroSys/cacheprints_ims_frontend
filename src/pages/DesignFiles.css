@@ -69,47 +69,6 @@
 }
 
 /* Gallery thumbnails */
-.df-card__gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-  gap: 8px;
-  margin-bottom: 8px;
-  padding: 8px;
-  background: #f9fafb;
-  border-radius: var(--radius-md);
-  border: 1px solid #e5e7eb;
-}
-.df-card__thumb {
-  aspect-ratio: 1;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  border: 1px solid var(--gray-border);
-  cursor: pointer;
-  position: relative;
-  transition: transform 0.2s;
-  background: white;
-}
-.df-card__thumb:hover {
-  transform: scale(1.05);
-  border-color: var(--primary);
-}
-.df-card__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.df-card__thumb-jos {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  background: #1e40af;
-  color: white;
-  font-size: 7px;
-  font-weight: 800;
-  padding: 1px 3px;
-  border-radius: 2px;
-  text-transform: uppercase;
-}
 .df-card__no-files {
   padding: 10px 14px;
   border: 1.5px dashed var(--gray-border);
@@ -199,10 +158,6 @@
   .df-summary { grid-template-columns: repeat(2, 1fr); }
 }
 
-.df-prod-link {
-  padding: 6px 10px; background: #e3f2fd; border-radius: var(--radius-sm);
-  border-left: 3px solid #90caf9; margin-bottom: 6px; font-size: 12px;
-}
 .df-file-pill__edit {
   font-size: 13px; color: var(--gray-mid); padding: 2px 5px;
   border-radius: var(--radius-sm); transition: background var(--transition), color var(--transition);
