@@ -150,7 +150,7 @@ export default function DesignFiles() {
           {order.design || <em style={{ color: 'var(--gray-light)' }}>No design description</em>}
         </p>
 
-        {order.designFileUrl && (
+        {(order.designFileUrl || order.finalDesignUrl) && (
           <div className="df-prod-link">
             <span style={{ fontSize: 11, color: 'var(--gray-mid)' }}>Job Order:</span>
             <button
@@ -381,7 +381,7 @@ export default function DesignFiles() {
           const rows = o.rows || []
           const largeSizes = new Set(['XXL', '3XL', '4XL', '5XL', 'XXXL', 'XXXXL'])
           const deadline = o.deadline ? formatDate(o.deadline) : 'TBD'
-          const finalDesignUrl = o.designFileUrl || ''
+          const finalDesignUrl = o.designFileUrl || o.finalDesignUrl || ''
           return (
             <div style={{ fontFamily: "'Segoe UI', Tahoma, sans-serif" }}>
               {/* Header */}
